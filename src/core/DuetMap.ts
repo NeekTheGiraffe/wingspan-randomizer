@@ -1,7 +1,11 @@
 import { Engine as RandomEngine, integer } from "random-js";
+import { Bitstring } from '@digitalbazaar/bitstring';
 
 const HABITATS = ['forest', 'grassland', 'wetland'] as const;
 type Habitat = typeof HABITATS[number];
+
+// type Result<T, E = undefined> = { ok: true, value: T }
+//                             | { ok: false, error: E | undefined };
 
 const numSpaces = 36;
 const spacesPerRow = 6;
@@ -26,51 +30,65 @@ interface StackElement {
 }
 
 export function generateDuetMap(engine: RandomEngine): DuetMap {
-    const emptyMap: PartialDuetMap = new Array(numSpaces).fill(null);
-    const firstViableMoves = shuffle(determineViableMoves(emptyMap), engine);
-    const unsolvableMaps = new Set();
-    const stack: StackElement[] = [{ map: emptyMap, viableMoves: firstViableMoves, moveIndex: 0 }];
     let itercount = 0;
-    while (stack.length > 0) {
-        // console.log(itercount++);
-        const { map, viableMoves, moveIndex } = stack[stack.length - 1];
-        if (moveIndex === viableMoves.length) {
-            unsolvableMaps.add(encode(map));
-            stack.pop();
-            continue;
+    let numFailures = 0;
+    for (;;) {
+        const emptyMap: PartialDuetMap = new Array(numSpaces).fill(null);
+        const firstViableMoves = shuffle(determineViableMoves(emptyMap), engine);
+        const unsolvableMaps = new Set<number>();
+        const stack: StackElement[] = [{ map: emptyMap, viableMoves: firstViableMoves, moveIndex: 0 }];
+        while (stack.length > 0) {
+            itercount++;
+            const { map, viableMoves, moveIndex } = stack[stack.length - 1];
+            if (moveIndex === viableMoves.length) {
+                unsolvableMaps.add(encode(map));
+                stack.pop();
+                continue;
+            }
+            const newMap = map.slice();
+            const move = viableMoves[moveIndex];
+            newMap[move.spaceIndex] = move.habitat;
+            stack[stack.length - 1].moveIndex++;
+            if (isDone(newMap)) {
+                // console.log(toString({ spaces: newMap }))
+                console.log(itercount, 'iterations,', numFailures, 'failures')
+                return { spaces: newMap };
+            }
+            if (unsolvableMaps.has(encode(newMap))) {
+                continue;
+            }
+            const newViableMoves = shuffle(determineViableMoves(newMap), engine);
+            stack.push({ map: newMap, viableMoves: newViableMoves, moveIndex: 0 });
         }
-        const newMap = map.slice();
-        const move = viableMoves[moveIndex];
-        newMap[move.spaceIndex] = move.habitat;
-        stack[stack.length - 1].moveIndex++;
-        if (isDone(newMap)) {
-            console.log(toString({ spaces: newMap }))
-            return { spaces: newMap };
-        }
-        if (unsolvableMaps.has(encode(newMap))) {
-            continue;
-        }
-        const newViableMoves = shuffle(determineViableMoves(newMap), engine);
-        stack.push({ map: newMap, viableMoves: newViableMoves, moveIndex: 0 });
+        // Generation failed due to hash collisions, retry
+        numFailures++;
     }
-    // Should never happen, because the empty map is solvable
-    throw new Error('Failed to generate duet map');
 }
 
+const mapping = {
+    forest: 1,
+    grassland: 2,
+    wetland: 3,
+};
+
 function encode(map: PartialDuetMap): number {
-    let result = 0;
+    let hash = 0; // Initialize hash
+    const PRIME = 0x9e3779b1; // A large prime for better mixing
+
     for (let i = 0; i < map.length; i++) {
-        const h = map[i];
-        if (h === 'forest') {
-            result += 1;
-        } else if (h === 'grassland') {
-            result += 2;
-        } else if (h === 'wetland') {
-            result += 3;
-        }
-        result <<= 2;
+        const val = map[i];
+        const value = val ? mapping[val] : 0;
+        
+        // Mix in the current value into the hash
+        hash ^= value; // XOR the value
+        hash = (hash * PRIME) | 0; // Multiply by a prime and keep it 32-bit
     }
-    return result;
+
+    hash ^= hash >>> 16;
+    hash = (hash * PRIME) | 0;
+    hash ^= hash >>> 13;
+
+    return (hash >>> 16) & 0x0000ffff; // 16-bit hash
 }
 
 function isDone(map: PartialDuetMap): map is Habitat[] {
