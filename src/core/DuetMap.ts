@@ -29,7 +29,7 @@ interface StackElement {
     moveIndex: number;
 }
 
-export function generateDuetMap(engine: RandomEngine): DuetMap {
+export function generateDuetMap(engine: RandomEngine): {map: DuetMap, iterations: number, failures: number} {
     let itercount = 0;
     let numFailures = 0;
     for (;;) {
@@ -51,8 +51,8 @@ export function generateDuetMap(engine: RandomEngine): DuetMap {
             stack[stack.length - 1].moveIndex++;
             if (isDone(newMap)) {
                 // console.log(toString({ spaces: newMap }))
-                console.log(itercount, 'iterations,', numFailures, 'failures')
-                return { spaces: newMap };
+                // console.log(itercount, 'iterations,', numFailures, 'failures')
+                return { map: {spaces: newMap}, iterations: itercount, failures: numFailures };
             }
             if (unsolvableMaps.has(encode(newMap))) {
                 continue;
@@ -72,6 +72,22 @@ const mapping = {
 };
 
 function encode(map: PartialDuetMap): number {
+    let result = 0;
+    for (let i = 0; i < map.length; i++) {
+        const h = map[i];
+        if (h === 'forest') {
+            result += 1;
+        } else if (h === 'grassland') {
+            result += 2;
+        } else if (h === 'wetland') {
+            result += 3;
+        }
+        result <<= 2;
+    }
+    return result;
+}
+
+function encode2(map: PartialDuetMap): number {
     let hash = 0; // Initialize hash
     const PRIME = 0x9e3779b1; // A large prime for better mixing
 
