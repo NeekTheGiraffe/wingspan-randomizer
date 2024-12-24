@@ -2,18 +2,90 @@ import { Engine as RandomEngine, integer } from "random-js";
 import { Bitstring } from '@digitalbazaar/bitstring';
 
 const HABITATS = ['forest', 'grassland', 'wetland'] as const;
-type Habitat = typeof HABITATS[number];
+export type Habitat = typeof HABITATS[number];
 
 // type Result<T, E = undefined> = { ok: true, value: T }
 //                             | { ok: false, error: E | undefined };
 
+const CRITERIA = [
+    'eats-invertebrate',
+    'eats-grain',
+    'eats-fruit',
+    'eats-rodent',
+    'eats-fish',
+    'beak-facing-left',
+    'beak-facing-right',
+    'bowl-nest',
+    'cavity-nest',
+    'ground-nest',
+    'platform-nest',
+    'wingspan-under-50cm',
+    'wingspan-at-least-50cm',
+] as const;
+type Criterion = typeof CRITERIA[number];
+
+const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
+    forest: [
+        'bowl-nest',
+        'bowl-nest',
+        'cavity-nest',
+        'cavity-nest',
+        'platform-nest',
+        'eats-grain',
+        'eats-fruit',
+        'eats-invertebrate',
+        'eats-invertebrate',
+        'eats-rodent',
+        'wingspan-under-50cm',
+        'beak-facing-left',
+    ],
+    grassland: [
+        'bowl-nest',
+        'cavity-nest',
+        'ground-nest',
+        'eats-grain',
+        'eats-grain',
+        'eats-invertebrate',
+        'eats-invertebrate',
+        'eats-fruit',
+        'eats-rodent',
+        'wingspan-under-50cm',
+        'wingspan-at-least-50cm',
+        'beak-facing-right',
+    ],
+    wetland: [
+        'platform-nest',
+        'platform-nest',
+        'ground-nest',
+        'ground-nest',
+        'cavity-nest',
+        'eats-fish',
+        'eats-fish',
+        'eats-invertebrate',
+        'eats-grain',
+        'beak-facing-left',
+        'beak-facing-right',
+        'wingspan-at-least-50cm',
+    ]
+};
+
 const numSpaces = 36;
 const spacesPerRow = 6;
+
+// function objectMap<T, R>(obj: T, mapper: (key: keyof T, value: T[keyof T]) => R) {
+//     const result: Record<keyof T, R> = {};
+//     for (const key in result) {
+//         result[key] = mapper(key, result[key]);
+//     }
+//     return result;
+// }
 
 export interface DuetMap {
     // 36 spaces total
     // TODO: Add details to the map (food/nest type/wingspan/beak facing)
-    spaces: Habitat[];
+    habitats: Habitat[];
+    criteria: Criterion[]; 
+    bonuses: boolean[];
 }
 
 type PartialDuetMap = (Habitat | null)[];
@@ -29,7 +101,40 @@ interface StackElement {
     moveIndex: number;
 }
 
-export function generateDuetMap(engine: RandomEngine): {map: DuetMap, iterations: number, failures: number} {
+export function generateDuetMap(engine: RandomEngine): DuetMap {
+    const habitatAssignments = generateHabitats(engine).map;
+    
+    const shuffledCriteriaByHabitat = { ...CRITERIA_BY_HABITAT };
+    for (const habitat of HABITATS) {
+        shuffledCriteriaByHabitat[habitat] = shuffle(CRITERIA_BY_HABITAT[habitat], engine);
+    }
+    const habitatCriteriaIndices: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
+    const criteria: Criterion[] = [];
+    for (let i = 0; i < numSpaces; i++) {
+        const habitat = habitatAssignments[i];
+        const nextCriteriaIndex = habitatCriteriaIndices[habitat];
+        criteria.push(shuffledCriteriaByHabitat[habitat][nextCriteriaIndex]);
+        habitatCriteriaIndices[habitat]++;
+    }
+
+    const numSpacesWithBonusByHabitat: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
+    const bonuses = new Array(numSpaces).fill(false);
+    for (const i of shuffle([...Array(numSpaces).keys()], engine)) {
+        const habitat = habitatAssignments[i];
+        if (numSpacesWithBonusByHabitat[habitat] < 3) {
+            bonuses[i] = true;
+            numSpacesWithBonusByHabitat[habitat]++;
+        }
+    }
+    
+    return {
+        habitats: habitatAssignments,
+        criteria,
+        bonuses,
+    }
+}
+
+export function generateHabitats(engine: RandomEngine): {map: Habitat[], iterations: number, failures: number} {
     let itercount = 0;
     let numFailures = 0;
     for (;;) {
@@ -52,7 +157,7 @@ export function generateDuetMap(engine: RandomEngine): {map: DuetMap, iterations
             if (isDone(newMap)) {
                 // console.log(toString({ spaces: newMap }))
                 // console.log(itercount, 'iterations,', numFailures, 'failures')
-                return { map: {spaces: newMap}, iterations: itercount, failures: numFailures };
+                return { map: newMap, iterations: itercount, failures: numFailures };
             }
             if (unsolvableMaps.has(encode(newMap))) {
                 continue;
@@ -217,7 +322,7 @@ export function toString(map: DuetMap): string {
             result.push('  ');
         }
         for (let col = 0; col < 6; col++) {
-            const habitat = map.spaces[row * 6 + col];
+            const habitat = map.habitats[row * 6 + col];
             let ch = 'O';
             if (habitat === 'forest') {
                 ch = 'F';
