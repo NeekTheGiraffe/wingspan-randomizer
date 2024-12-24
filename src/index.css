@@ -11,10 +11,119 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --circle-size: 50px;
+  --gap-size: 25px;
+  --vertical-gap-size: calc(var(--gap-size) - var(--circle-size) * (1 - 1.73 / 2));
+  --offset-size: calc(0.5 * (var(--circle-size) + var(--gap-size)));
+  --lines-angle: 62deg;
 }
 
 code {
   white-space: pre-wrap;
+}
+
+.dot {
+  height: var(--circle-size);
+  width: var(--circle-size);
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+
+.duet-map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vertical-gap-size);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-size);
+  position: relative;
+}
+
+.row::before,
+.southeast-6::before, .southeast-4::before, .southeast-2::before,
+.southwest-6::after, .southwest-5::after, .southwest-3::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  height: 2px;
+  background-color: black;
+  z-index: 0;
+}
+
+.row::before {
+  top: calc(var(--circle-size) / 2);
+  width: calc(var(--circle-size) * 6 + var(--gap-size) * 5);
+  transform: translateY(-50%);
+}
+
+.southeast-6::before {
+  top: calc(5 / 2 * var(--vertical-gap-size) + 3 * var(--circle-size));
+  left: calc(-3 / 2 * var(--circle-size) - 3 / 2 * var(--gap-size) + 1 / 2 * var(--offset-size));
+  width: calc(var(--circle-size) * 6 + var(--gap-size) * 5);
+  transform: rotate(var(--lines-angle));
+}
+
+.southeast-4::before {
+  top: calc(3 / 2 * var(--vertical-gap-size) + 2 * var(--circle-size));
+  left: calc(-1 / 2 * var(--circle-size) - 1 / 2 * var(--gap-size) - 1 / 2 * var(--offset-size));
+  width: calc(var(--circle-size) * 4 + var(--gap-size) * 3);
+  transform: rotate(var(--lines-angle));
+}
+
+.southeast-2::before {
+  top: calc(1 / 2 * var(--vertical-gap-size) + var(--circle-size));
+  left: calc(-1 / 2 * var(--circle-size) - 1 / 2 * var(--gap-size) + 1 / 2 * var(--offset-size));
+  width: calc(var(--circle-size) * 2 + var(--gap-size));
+  transform: rotate(var(--lines-angle));
+}
+
+.southwest-6::after {
+  top: calc(5 / 2 * var(--vertical-gap-size) + 3 * var(--circle-size));
+  left: calc(-7 / 2 * var(--circle-size) - 7 / 2 * var(--gap-size) - 1 / 2 * var(--offset-size));
+  width: calc(var(--circle-size) * 6 + var(--gap-size) * 5);
+  transform: rotate(calc(-1 * var(--lines-angle)));
+}
+
+.southwest-5::after {
+  top: calc(2 * var(--vertical-gap-size) + 5/2 * var(--circle-size));
+  left: calc(-3 * var(--circle-size) - 3 * var(--gap-size));
+  width: calc(var(--circle-size) * 5 + var(--gap-size) * 4);
+  transform: rotate(calc(-1 * var(--lines-angle)));
+}
+
+.southwest-3::after {
+  top: calc(var(--vertical-gap-size) + 3/2 * var(--circle-size));
+  left: calc(-3/2 * var(--circle-size) - 3/2 * var(--gap-size));
+  width: calc(var(--circle-size) * 3 + var(--gap-size) * 2);
+  transform: rotate(calc(-1 * var(--lines-angle)));
+}
+
+.dot-container {
+  height: var(--circle-size);
+  position: relative;
+}
+
+.odd {
+  margin-left: var(--offset-size);
+}
+
+.forest {
+  background-color: darkgreen;
+}
+
+.grassland {
+  background-color: darkgoldenrod;
+}
+
+.wetland {
+  background-color:rgb(8, 71, 92);
 }
 
 a {
