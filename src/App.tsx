@@ -23,7 +23,11 @@ function dotRepresentation(map: Habitat[]) {
     {[...Array(6).keys()].map(row => 
     <div key={row} className={`row ${row % 2 === 0 ? 'even' : 'odd'}`}>
       {map.slice(6 * row, 6 * (row + 1)).map((habitat, col) =>
-        <div key={6 * row + col} className={`dot-container ${helperClasses[6 * row + col] ?? ''}`}><span className={`dot ${habitat} `} /></div>)}
+        <div key={6 * row + col} className={`dot-container ${helperClasses[6 * row + col] ?? ''}`}>
+          {/* <div className={'hexagon'}> */}
+            <span className={`dot`}><div className={`hexagon ${habitat}`}></div></span>
+          {/* </div> */}
+        </div>)}
     </div>
   )}
   </div>;
