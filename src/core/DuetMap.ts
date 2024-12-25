@@ -7,14 +7,14 @@ export type Habitat = typeof HABITATS[number];
 // type Result<T, E = undefined> = { ok: true, value: T }
 //                             | { ok: false, error: E | undefined };
 
-const CRITERIA = [
+export const CRITERIA = [
     'eats-invertebrate',
-    'eats-grain',
+    'eats-seed',
     'eats-fruit',
     'eats-rodent',
     'eats-fish',
-    'beak-facing-left',
-    'beak-facing-right',
+    'beak-pointing-left',
+    'beak-pointing-right',
     'bowl-nest',
     'cavity-nest',
     'ground-nest',
@@ -22,7 +22,7 @@ const CRITERIA = [
     'wingspan-under-50cm',
     'wingspan-at-least-50cm',
 ] as const;
-type Criterion = typeof CRITERIA[number];
+export type Criterion = typeof CRITERIA[number];
 
 const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
     forest: [
@@ -31,27 +31,27 @@ const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
         'cavity-nest',
         'cavity-nest',
         'platform-nest',
-        'eats-grain',
+        'eats-seed',
         'eats-fruit',
         'eats-invertebrate',
         'eats-invertebrate',
         'eats-rodent',
         'wingspan-under-50cm',
-        'beak-facing-left',
+        'beak-pointing-left',
     ],
     grassland: [
         'bowl-nest',
         'cavity-nest',
         'ground-nest',
-        'eats-grain',
-        'eats-grain',
+        'eats-seed',
+        'eats-seed',
         'eats-invertebrate',
         'eats-invertebrate',
         'eats-fruit',
         'eats-rodent',
         'wingspan-under-50cm',
         'wingspan-at-least-50cm',
-        'beak-facing-right',
+        'beak-pointing-right',
     ],
     wetland: [
         'platform-nest',
@@ -62,9 +62,9 @@ const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
         'eats-fish',
         'eats-fish',
         'eats-invertebrate',
-        'eats-grain',
-        'beak-facing-left',
-        'beak-facing-right',
+        'eats-seed',
+        'beak-pointing-left',
+        'beak-pointing-right',
         'wingspan-at-least-50cm',
     ]
 };

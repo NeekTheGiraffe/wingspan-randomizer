@@ -42,6 +42,11 @@ code {
   /* z-index: 1; */
 }
 
+.dot:has(.nest) {
+  background-color: #735b55;
+  outline-offset: -1px;
+}
+
 .duet-map {
   display: flex;
   flex-direction: column;
@@ -175,6 +180,34 @@ code {
 }
 .wetland::before { border-bottom-color: var(--wetland-color); }
 .wetland::after  { border-top-color: var(--wetland-color); }
+
+/* img {
+  z-index: 1;
+} */
+
+img {
+  /* pointer-events: none; */
+  user-select: none;
+}
+
+.criterion {
+  width: calc(var(--circle-size) * 0.75);
+  /* top: calc(var(--circle-size) * 0.125);
+  left: calc(var(--circle-size) * 0.125); */
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.wingspan {
+  width: var(--circle-size);
+}
+.beak {
+  width: calc(0.95 * var(--circle-size));
+  height: calc(0.95 * var(--circle-size));
+}
 
 a {
   font-weight: 500;
