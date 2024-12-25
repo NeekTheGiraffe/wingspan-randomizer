@@ -139,7 +139,7 @@ export function generateHabitats(engine: RandomEngine): {map: Habitat[], iterati
     let numFailures = 0;
     for (;;) {
         const emptyMap: PartialDuetMap = new Array(numSpaces).fill(null);
-        const firstViableMoves = shuffle(determineViableMoves(emptyMap), engine);
+        const firstViableMoves = shuffle(determineViableMoves(emptyMap).viableMoves, engine);
         const unsolvableMaps = new Set<number>();
         const stack: StackElement[] = [{ map: emptyMap, viableMoves: firstViableMoves, moveIndex: 0 }];
         while (stack.length > 0) {
@@ -162,11 +162,19 @@ export function generateHabitats(engine: RandomEngine): {map: Habitat[], iterati
             if (unsolvableMaps.has(encode(newMap))) {
                 continue;
             }
-            const newViableMoves = shuffle(determineViableMoves(newMap), engine);
-            stack.push({ map: newMap, viableMoves: newViableMoves, moveIndex: 0 });
+            const { viableMoves: newViableMoves, isDeadEnd } = determineViableMoves(newMap);
+            if (isDeadEnd) {
+                // console.log('dead end')
+                // mark as unsolvable
+                unsolvableMaps.add(encode(map));
+                continue;
+            }
+            const shuffledNewViableMoves = shuffle(newViableMoves, engine);
+            stack.push({ map: newMap, viableMoves: shuffledNewViableMoves, moveIndex: 0 });
         }
         // Generation failed due to hash collisions, retry
         numFailures++;
+        console.log('fail')
     }
 }
 
@@ -176,18 +184,23 @@ const mapping = {
     wetland: 3,
 };
 
-function encode(map: PartialDuetMap): number {
+export function encode(map: PartialDuetMap): number {
     let result = 0;
     for (let i = 0; i < map.length; i++) {
         const h = map[i];
+        let mixin = 0;
         if (h === 'forest') {
-            result += 1;
+            mixin = 1;
         } else if (h === 'grassland') {
-            result += 2;
+            mixin = 2;
         } else if (h === 'wetland') {
-            result += 3;
+            mixin = 3;
         }
+        result += mixin;
         result <<= 2;
+        // if (i < 16) result |= mixin << (2 * i);
+        // if (i >= 20) result |= mixin << (2 * (i-20));
+        // result ^= mixin << (2 * (i % 16));
     }
     return result;
 }
@@ -222,7 +235,7 @@ function isDone(map: PartialDuetMap): map is Habitat[] {
     return true;
 }
 
-function determineViableMoves(map: PartialDuetMap): Move[] {
+function determineViableMoves(map: PartialDuetMap) {
     const habitatCounts: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
     for (let i = 0; i < numSpaces; i++) {
         const habitat = map[i];
@@ -232,6 +245,7 @@ function determineViableMoves(map: PartialDuetMap): Move[] {
     }
     // console.log('habitatCounts', habitatCounts);
     const result: Move[] = [];
+    const nMovesPerHabitat: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
     for (let i = 0; i < numSpaces; i++) {
         if (map[i] !== null) {
             continue;
@@ -244,11 +258,15 @@ function determineViableMoves(map: PartialDuetMap): Move[] {
             )) {
                 // console.log({habitat, spaceIndex: i});
                 result.push({ habitat, spaceIndex: i });
+                nMovesPerHabitat[habitat]++;
             }
         }
     }
     // console.log('viableMoves', result);
-    return result;
+    return {
+        viableMoves: result,
+        isDeadEnd: HABITATS.some(h => habitatCounts[h] < 12 && nMovesPerHabitat[h] === 0),
+    };
 }
 
 function shuffle<T>(array: T[], engine: RandomEngine): T[] {
