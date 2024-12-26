@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { generateDuetMap, toString, neighbors, DuetMap, Habitat, Criterion } from './core/DuetMap'
-import { MersenneTwister19937 as mt } from 'random-js'
+import { MersenneTwister19937 as mt, string } from 'random-js'
 import invertebrate from './assets/invertebrate.svg'
 
 interface IconParams {
@@ -116,15 +116,55 @@ function dotRepresentation(map: DuetMap) {
   </div>;
 }
 
-const initialMap = generateDuetMap(mt.autoSeed());
+// const initialMap = generateDuetMap(mt.autoSeed());
+
+const seedGeneratorEngine = mt.autoSeed();
+const stringGenerator = string('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789');
+const seedLength = 16;
+const initialSeed = stringGenerator(seedGeneratorEngine, seedLength);
+
+function stringToArray(s: string) {
+  return [...Array(s.length).keys()].map(i => s.charCodeAt(i));
+}
 
 function App() {
-  const [map, setMap] = useState(initialMap);
+  const [seed, setSeed] = useState(initialSeed);
+  const [seedHasChanged, setSeedHasChanged] = useState(false);
+  const [map, setMap] = useState(() => generateDuetMap(mt.seedWithArray(stringToArray(initialSeed))));
 
   return (
     <>
       {/* <code>{toString(map)}</code> */}
-      <button onClick={() => setMap(generateDuetMap(mt.autoSeed()))}>Regenerate</button><br/>
+      <div className='main-bar'>
+        <input
+          placeholder='seed'
+          value={seed}
+          onChange={(e => {
+            setSeedHasChanged(true);
+            setSeed(e.target.value);
+          })}
+        />
+        <button
+          disabled={!seedHasChanged}
+          onClick={() => {
+            setMap(generateDuetMap(mt.seedWithArray(stringToArray(seed))));
+            setSeedHasChanged(false);
+          }}
+        >
+          Generate
+        </button>
+        <button
+          onClick={() => {
+            const newSeed = stringGenerator(seedGeneratorEngine, seedLength);
+            setSeed(newSeed);
+            setMap(generateDuetMap(mt.seedWithArray(stringToArray(newSeed))));
+            setSeedHasChanged(false);
+          }}
+        >
+          New seed
+        </button>
+      </div>
+      <br/>
       {dotRepresentation(map)}
       
       {/* <div>

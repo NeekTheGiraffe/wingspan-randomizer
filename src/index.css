@@ -51,6 +51,20 @@ code {
   display: flex;
   flex-direction: column;
   gap: var(--vertical-gap-size);
+  /* margin-top: var(--circle-size); */
+  margin-top: calc(10px +    0.5 / 1.73 * (var(--circle-size) + var(--gap-size)));
+}
+
+.main-bar {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+input { 
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #888;
 }
 
 .row {
