@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import {
   generateDuetMap,
@@ -50,7 +50,7 @@ function DuetMapDrawing({ map }: { map: DuetMap }) {
                       draggable={false}
                       className={`criterion ${imgClasses}`}
                       src={src}
-                      alt={alt}
+                      alt={`${habitat} ${alt}`}
                     />
                     <div className={`hexagon ${habitat}`}></div>
                   </span>
@@ -85,6 +85,7 @@ function App() {
   const map = useMemo(() => {
     return generateDuetMap(mt.seedWithArray(stringToArray(seed)));
   }, [mapSeed]);
+  const [showCheckmark, setShowCheckmark] = useState(0);
 
   useEffect(() => {
     setSearchParams({ seed: mapSeed });
@@ -120,9 +121,20 @@ function App() {
         <button
           onClick={() => {
             navigator.clipboard.writeText(window.location.href);
+            setShowCheckmark((value) => value + 1);
+            setTimeout(() => setShowCheckmark((value) => value - 1), 1000);
           }}
+          id="copy-link-button"
         >
-          Copy link
+          {showCheckmark > 0 ? (
+            <img
+              className="checkmark"
+              src="./check.svg"
+              alt="Successfully copied"
+            />
+          ) : (
+            <span>Copy link</span>
+          )}
         </button>
       </div>
       <br />

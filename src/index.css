@@ -252,6 +252,13 @@ img {
   user-select: none;
 }
 
+.checkmark {
+  width: 0.95rem;
+}
+#copy-link-button {
+  width: 7rem;
+}
+
 .criterion {
   width: calc(var(--circle-size) * 0.75);
   /* top: calc(var(--circle-size) * 0.125);
