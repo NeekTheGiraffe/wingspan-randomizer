@@ -195,6 +195,14 @@ input {
 .wetland::before { border-bottom-color: var(--wetland-color); }
 .wetland::after  { border-top-color: var(--wetland-color); }
 
+.bonus {
+  width: calc(var(--circle-size) * 0.6);
+  position: absolute;
+  left: calc(-0.3 * var(--circle-size));
+  top: calc(var(--circle-size) * 0.2);
+  z-index: 2;
+}
+
 /* img {
   z-index: 1;
 } */

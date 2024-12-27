@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   height="800px"
+   width="800px"
+   version="1.1"
+   id="_x32_"
+   viewBox="0 0 512 512"
+   xml:space="preserve"
+   sodipodi:docname="bonus-egg.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs1" /><sodipodi:namedview
+   id="namedview1"
+   pagecolor="#735b55"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="0.9425"
+   inkscape:cx="400"
+   inkscape:cy="400"
+   inkscape:window-width="1920"
+   inkscape:window-height="1039"
+   inkscape:window-x="0"
+   inkscape:window-y="48"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g1" />
+<style
+   type="text/css"
+   id="style1">
+	.st0{fill:#000000;}
+</style>
+<g
+   id="g1">
+	<path
+   d="M 256,0 C 170.813,0 65.938,120.242 65.938,283.149 65.938,446.062 162.906,512 256,512 349.09,512 446.062,446.062 446.062,283.149 446.062,120.242 341.184,0 256,0 Z"
+   id="path1"
+   sodipodi:nodetypes="sssss" /><path
+   d="m 256,476 c -74.477,0 -154.062,-50.664 -154.062,-192.851 0,-67.469 19.942,-131.898 56.149,-181.414 C 187.73,61.187 225.246,36 256,36 c 30.75,0 68.27,25.187 97.914,65.734 36.206,49.516 56.148,113.946 56.148,181.414 C 410.062,425.336 330.477,476 256,476 Z"
+   id="path2"
+   style="fill:#f9f9f9" />
+</g>
+</svg>

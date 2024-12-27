@@ -80,6 +80,18 @@ const iconParams: Record<Criterion, IconParams> = {
   },
 }
 
+const bonusIcons: Record<Habitat, { src: string }> = {
+  forest: {
+    src: './bonus-food.svg',
+  },
+  grassland: {
+    src: './bonus-egg.svg',
+  },
+  wetland: {
+    src: './bonus-card.svg',
+  }
+};
+
 function dotRepresentation(map: DuetMap) {
   const helperClasses: Record<number, string> = {
     0: "southeast-6",
@@ -102,6 +114,9 @@ function dotRepresentation(map: DuetMap) {
         const { src, imgClasses, alt } = iconParams[map.criteria[i]];
         return <div key={6 * row + col} className={`dot-container ${helperClasses[i] ?? ''}`}>
             <span className={`dot`}>
+              {map.bonuses[i]
+                ? <img src={bonusIcons[habitat].src} className='bonus' /> 
+                : null}
               <img
                 draggable={false}
                 className={`criterion ${imgClasses}`}
