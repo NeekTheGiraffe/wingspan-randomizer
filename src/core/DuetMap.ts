@@ -4,9 +4,6 @@ import { Bitstring } from '@digitalbazaar/bitstring';
 const HABITATS = ['forest', 'grassland', 'wetland'] as const;
 export type Habitat = typeof HABITATS[number];
 
-// type Result<T, E = undefined> = { ok: true, value: T }
-//                             | { ok: false, error: E | undefined };
-
 export const CRITERIA = [
     'eats-invertebrate',
     'eats-seed',
@@ -69,20 +66,11 @@ const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
     ]
 };
 
-const numSpaces = 36;
-const spacesPerRow = 6;
-
-// function objectMap<T, R>(obj: T, mapper: (key: keyof T, value: T[keyof T]) => R) {
-//     const result: Record<keyof T, R> = {};
-//     for (const key in result) {
-//         result[key] = mapper(key, result[key]);
-//     }
-//     return result;
-// }
+export const NUM_ROWS = 6;
+export const SPACES_PER_ROW = 6;
+export const NUM_SPACES = 36;
 
 export interface DuetMap {
-    // 36 spaces total
-    // TODO: Add details to the map (food/nest type/wingspan/beak facing)
     habitats: Habitat[];
     criteria: Criterion[]; 
     bonuses: boolean[];
@@ -110,7 +98,7 @@ export function generateDuetMap(engine: RandomEngine): DuetMap {
     }
     const habitatCriteriaIndices: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
     const criteria: Criterion[] = [];
-    for (let i = 0; i < numSpaces; i++) {
+    for (let i = 0; i < NUM_SPACES; i++) {
         const habitat = habitatAssignments[i];
         const nextCriteriaIndex = habitatCriteriaIndices[habitat];
         criteria.push(shuffledCriteriaByHabitat[habitat][nextCriteriaIndex]);
@@ -118,8 +106,8 @@ export function generateDuetMap(engine: RandomEngine): DuetMap {
     }
 
     const numSpacesWithBonusByHabitat: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
-    const bonuses = new Array(numSpaces).fill(false);
-    for (const i of shuffle([...Array(numSpaces).keys()], engine)) {
+    const bonuses = new Array(NUM_SPACES).fill(false);
+    for (const i of shuffle([...Array(NUM_SPACES).keys()], engine)) {
         const habitat = habitatAssignments[i];
         if (numSpacesWithBonusByHabitat[habitat] < 3) {
             bonuses[i] = true;
@@ -138,7 +126,7 @@ export function generateHabitats(engine: RandomEngine): {map: Habitat[], iterati
     let itercount = 0;
     let numFailures = 0;
     for (;;) {
-        const emptyMap: PartialDuetMap = new Array(numSpaces).fill(null);
+        const emptyMap: PartialDuetMap = new Array(NUM_SPACES).fill(null);
         const firstViableMoves = shuffle(determineViableMoves(emptyMap).viableMoves, engine);
         const unsolvableMaps = new Set<number>();
         const stack: StackElement[] = [{ map: emptyMap, viableMoves: firstViableMoves, moveIndex: 0 }];
@@ -237,7 +225,7 @@ function isDone(map: PartialDuetMap): map is Habitat[] {
 
 function determineViableMoves(map: PartialDuetMap) {
     const existingSpaces: {[h in Habitat]: number[]} = Object.assign({}, ...HABITATS.map(h => ({[h]: []})));
-    for (let i = 0; i < numSpaces; i++) {
+    for (let i = 0; i < NUM_SPACES; i++) {
         const habitat = map[i];
         if (habitat !== null) {
             existingSpaces[habitat].push(i);
@@ -246,7 +234,7 @@ function determineViableMoves(map: PartialDuetMap) {
     // Perform DFS for each habitat
     for (const habitat of HABITATS) {
         // console.log('performing dfs');
-        const visited = new Array(36).fill(false);
+        const visited = new Array(NUM_SPACES).fill(false);
         const stack = existingSpaces[habitat].slice();
         if (stack.length === 0) {
             continue;
@@ -276,7 +264,7 @@ function determineViableMoves(map: PartialDuetMap) {
     // console.log('habitatCounts', habitatCounts);
     const result: Move[] = [];
     const nMovesPerHabitat: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
-    for (let i = 0; i < numSpaces; i++) {
+    for (let i = 0; i < NUM_SPACES; i++) {
         if (map[i] !== null) {
             continue;
         }
@@ -312,26 +300,26 @@ function shuffle<T>(array: T[], engine: RandomEngine): T[] {
 
 export function neighbors(i: number): number[] {
     const result = [];
-    const isRightmostInRow = i % spacesPerRow === spacesPerRow - 1;
-    const isLeftmostInRow = i % spacesPerRow === 0;
-    const isInBottomRow = Math.floor(i / spacesPerRow) === 5;
-    const isInTopRow = i < spacesPerRow;
-    const isInEvenRow = Math.floor(i / spacesPerRow) % 2 === 0;
+    const isRightmostInRow = i % SPACES_PER_ROW === SPACES_PER_ROW - 1;
+    const isLeftmostInRow = i % SPACES_PER_ROW === 0;
+    const isInBottomRow = Math.floor(i / SPACES_PER_ROW) === 5;
+    const isInTopRow = i < SPACES_PER_ROW;
+    const isInEvenRow = Math.floor(i / SPACES_PER_ROW) % 2 === 0;
     // east
     if (!isRightmostInRow) {
         result.push(i + 1);
     }
     // southeast
     if (isInEvenRow) {
-        result.push(i + spacesPerRow);
+        result.push(i + SPACES_PER_ROW);
     } else if (!isRightmostInRow && !isInBottomRow) {
-        result.push(i + spacesPerRow + 1);
+        result.push(i + SPACES_PER_ROW + 1);
     } 
     // southwest
     if (isInEvenRow && !isLeftmostInRow) {
-        result.push(i + spacesPerRow - 1);
+        result.push(i + SPACES_PER_ROW - 1);
     } else if (!isInEvenRow && !isInBottomRow) {
-        result.push(i + spacesPerRow);
+        result.push(i + SPACES_PER_ROW);
     }
     // west
     if (!isLeftmostInRow) {
@@ -339,15 +327,15 @@ export function neighbors(i: number): number[] {
     }
     // northwest
     if (!isInEvenRow) {
-        result.push(i - spacesPerRow);
+        result.push(i - SPACES_PER_ROW);
     } else if (!isInTopRow && !isLeftmostInRow) {        
-        result.push(i - spacesPerRow - 1);
+        result.push(i - SPACES_PER_ROW - 1);
     }
     // northeast
     if (!isInEvenRow && !isRightmostInRow) {
-        result.push(i - spacesPerRow + 1);
+        result.push(i - SPACES_PER_ROW + 1);
     } else if (isInEvenRow && !isInTopRow) {
-        result.push(i - spacesPerRow);
+        result.push(i - SPACES_PER_ROW);
     }
     return result;
 }
@@ -365,12 +353,12 @@ export function neighbors(i: number): number[] {
 //    O - O - O - O - O - O
 export function toString(map: PartialDuetMap): string {
     const result = [];
-    for (let row = 0; row < 6; row++) {
+    for (let row = 0; row < NUM_ROWS; row++) {
         if (row % 2 === 1) {
             result.push('  ');
         }
-        for (let col = 0; col < 6; col++) {
-            const habitat = map[row * 6 + col];
+        for (let col = 0; col < SPACES_PER_ROW; col++) {
+            const habitat = map[row * SPACES_PER_ROW + col];
             let ch = 'O';
             if (habitat === 'forest') {
                 ch = 'F';

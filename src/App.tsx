@@ -1,96 +1,8 @@
-import { useCallback, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState } from 'react'
 import './App.css'
-import { generateDuetMap, toString, neighbors, DuetMap, Habitat, Criterion } from './core/DuetMap'
+import { generateDuetMap, toString, neighbors, DuetMap, Habitat, Criterion, NUM_ROWS, SPACES_PER_ROW } from './core/DuetMap'
 import { MersenneTwister19937 as mt, string } from 'random-js'
-import invertebrate from './assets/invertebrate.svg'
-
-interface IconParams {
-  alt: string,
-  src: string,
-  imgClasses: string,
-}
-
-const iconParams: Record<Criterion, IconParams> = {
-  'beak-pointing-left': {
-    alt: "Beak pointing left",
-    src: "./beak-left.svg",
-    imgClasses: "beak",
-  },
-  'beak-pointing-right': {
-    alt: "Beak pointing left",
-    src: "./beak-right.svg",
-    imgClasses: "beak",
-  },
-  'bowl-nest': {
-    alt: "Bowl nest",
-    src: "./nest-bowl.svg",
-    imgClasses: "nest",
-  },
-  'cavity-nest': {
-    alt: "Cavity nest",
-    src: "./nest-cavity.svg",
-    imgClasses: "nest",
-  },
-  'ground-nest': {
-    alt: "Ground nest",
-    src: "./nest-ground.svg",
-    imgClasses: "nest",
-  },
-  'platform-nest': {
-    alt: "Platform nest",
-    src: "./nest-platform.svg",
-    imgClasses: "nest",
-  },
-  'eats-fish': {
-    alt: "Eats fish",
-    src: "./fish.svg",
-    imgClasses: "",
-  },
-  'eats-fruit': {
-    alt: "Eats fruit",
-    src: "./fruit.svg",
-    imgClasses: "",
-  },
-  'eats-invertebrate': {
-    alt: "Eats invertebrate",
-    src: "./invertebrate.svg",
-    imgClasses: "",
-  },
-  'eats-rodent': {
-    alt: "Eats rodent",
-    src: "./rodent.svg",
-    imgClasses: "",
-  },
-  'eats-seed': {
-    alt: "Eats seed",
-    src: "./seed.svg",
-    imgClasses: "",
-  },
-  'wingspan-at-least-50cm': {
-    alt: "Wingspan at least 50cm",
-    src: "./wingspan-at-least-50cm.svg",
-    imgClasses: "",
-  },
-  'wingspan-under-50cm': {
-    alt: "Wingspan under 50cm",
-    src: "./wingspan-under-50cm.svg",
-    imgClasses: "",
-  },
-}
-
-const bonusIcons: Record<Habitat, { src: string }> = {
-  forest: {
-    src: './bonus-food.svg',
-  },
-  grassland: {
-    src: './bonus-egg.svg',
-  },
-  wetland: {
-    src: './bonus-card.svg',
-  }
-};
+import { BONUS_ICON_PARAMS, CRITERIA_ICON_PARAMS } from './constants'
 
 function dotRepresentation(map: DuetMap) {
   const helperClasses: Record<number, string> = {
@@ -107,15 +19,15 @@ function dotRepresentation(map: DuetMap) {
   }
 
   return <div className="duet-map">
-    {[...Array(6).keys()].map(row => 
+    {[...Array(NUM_ROWS).keys()].map(row => 
     <div key={row} className={`row ${row % 2 === 0 ? 'even' : 'odd'}`}>
-      {map.habitats.slice(6 * row, 6 * (row + 1)).map((habitat, col) => {
-        const i = 6 * row + col;
-        const { src, imgClasses, alt } = iconParams[map.criteria[i]];
-        return <div key={6 * row + col} className={`dot-container ${helperClasses[i] ?? ''}`}>
+      {map.habitats.slice(SPACES_PER_ROW * row, SPACES_PER_ROW * (row + 1)).map((habitat, col) => {
+        const i = SPACES_PER_ROW * row + col;
+        const { src, imgClasses, alt } = CRITERIA_ICON_PARAMS[map.criteria[i]];
+        return <div key={i} className={`dot-container ${helperClasses[i] ?? ''}`}>
             <span className={`dot`}>
               {map.bonuses[i]
-                ? <img src={bonusIcons[habitat].src} className='bonus' /> 
+                ? <img src={BONUS_ICON_PARAMS[habitat].src} className='bonus' /> 
                 : null}
               <img
                 draggable={false}
