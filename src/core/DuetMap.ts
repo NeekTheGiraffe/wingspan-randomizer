@@ -89,6 +89,20 @@ interface StackElement {
   moveIndex: number;
 }
 
+type CallbackOrValue<T, R> = R | ((input: T) => R);
+
+function forEachHabitat<T>(
+  input: CallbackOrValue<Habitat, T>,
+): Record<Habitat, T> {
+  if (typeof input === "function") {
+    return Object.assign(
+      {},
+      ...HABITATS.map((h) => ({ [h]: (input as (h: Habitat) => T)(h) })),
+    );
+  }
+  return Object.assign({}, ...HABITATS.map((h) => ({ [h]: input })));
+}
+
 export function generateDuetMap(engine: RandomEngine): DuetMap {
   const habitatAssignments = generateHabitats(engine).map;
 
@@ -99,10 +113,7 @@ export function generateDuetMap(engine: RandomEngine): DuetMap {
       engine,
     );
   }
-  const habitatCriteriaIndices: { [h in Habitat]: number } = Object.assign(
-    {},
-    ...HABITATS.map((h) => ({ [h]: 0 })),
-  );
+  const habitatCriteriaIndices = forEachHabitat(0);
   const criteria: Criterion[] = [];
   for (let i = 0; i < NUM_SPACES; i++) {
     const habitat = habitatAssignments[i];
@@ -111,10 +122,7 @@ export function generateDuetMap(engine: RandomEngine): DuetMap {
     habitatCriteriaIndices[habitat]++;
   }
 
-  const numSpacesWithBonusByHabitat: { [h in Habitat]: number } = Object.assign(
-    {},
-    ...HABITATS.map((h) => ({ [h]: 0 })),
-  );
+  const numSpacesWithBonusByHabitat = forEachHabitat(0);
   const bonuses = new Array(NUM_SPACES).fill(false);
   for (const i of shuffle([...Array(NUM_SPACES).keys()], engine)) {
     const habitat = habitatAssignments[i];
@@ -247,10 +255,7 @@ function isDone(map: PartialDuetMap): map is Habitat[] {
 }
 
 function determineViableMoves(map: PartialDuetMap) {
-  const existingSpaces: { [h in Habitat]: number[] } = Object.assign(
-    {},
-    ...HABITATS.map((h) => ({ [h]: [] })),
-  );
+  const existingSpaces = forEachHabitat<number[]>(() => []);
   for (let i = 0; i < NUM_SPACES; i++) {
     const habitat = map[i];
     if (habitat !== null) {
@@ -289,10 +294,7 @@ function determineViableMoves(map: PartialDuetMap) {
 
   // console.log('habitatCounts', habitatCounts);
   const result: Move[] = [];
-  const nMovesPerHabitat: { [h in Habitat]: number } = Object.assign(
-    {},
-    ...HABITATS.map((h) => ({ [h]: 0 })),
-  );
+  const nMovesPerHabitat = forEachHabitat(0);
   for (let i = 0; i < NUM_SPACES; i++) {
     if (map[i] !== null) {
       continue;
