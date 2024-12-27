@@ -1,4 +1,4 @@
-import { generateDuetMap, generateHabitats } from "./DuetMap";
+import { generateDuetMap, generateHabitats } from "../src/core/DuetMap";
 import { MersenneTwister19937 as mt } from 'random-js'
 
 let totalFailures = 0;

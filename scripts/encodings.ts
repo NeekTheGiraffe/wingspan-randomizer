@@ -1,4 +1,4 @@
-import { encode, Habitat } from './DuetMap';
+import { encode, Habitat } from '../src/core/DuetMap';
 
 function mapFromString(s: string): (Habitat | null)[] {
     const result: (Habitat | null)[] = [];
