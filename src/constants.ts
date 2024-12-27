@@ -1,87 +1,87 @@
-import { Criterion, Habitat } from "./core/DuetMap"
+import { Criterion, Habitat } from "./core/DuetMap";
 
 interface CriteriaIconParams {
-  alt: string,
-  src: string,
-  imgClasses: string,
+  alt: string;
+  src: string;
+  imgClasses: string;
 }
 
 export const CRITERIA_ICON_PARAMS: Record<Criterion, CriteriaIconParams> = {
-  'beak-pointing-left': {
+  "beak-pointing-left": {
     alt: "Beak pointing left",
     src: "./beak-left.svg",
     imgClasses: "beak",
   },
-  'beak-pointing-right': {
+  "beak-pointing-right": {
     alt: "Beak pointing left",
     src: "./beak-right.svg",
     imgClasses: "beak",
   },
-  'bowl-nest': {
+  "bowl-nest": {
     alt: "Bowl nest",
     src: "./nest-bowl.svg",
     imgClasses: "nest",
   },
-  'cavity-nest': {
+  "cavity-nest": {
     alt: "Cavity nest",
     src: "./nest-cavity.svg",
     imgClasses: "nest",
   },
-  'ground-nest': {
+  "ground-nest": {
     alt: "Ground nest",
     src: "./nest-ground.svg",
     imgClasses: "nest",
   },
-  'platform-nest': {
+  "platform-nest": {
     alt: "Platform nest",
     src: "./nest-platform.svg",
     imgClasses: "nest",
   },
-  'eats-fish': {
+  "eats-fish": {
     alt: "Eats fish",
     src: "./fish.svg",
     imgClasses: "",
   },
-  'eats-fruit': {
+  "eats-fruit": {
     alt: "Eats fruit",
     src: "./fruit.svg",
     imgClasses: "",
   },
-  'eats-invertebrate': {
+  "eats-invertebrate": {
     alt: "Eats invertebrate",
     src: "./invertebrate.svg",
     imgClasses: "",
   },
-  'eats-rodent': {
+  "eats-rodent": {
     alt: "Eats rodent",
     src: "./rodent.svg",
     imgClasses: "",
   },
-  'eats-seed': {
+  "eats-seed": {
     alt: "Eats seed",
     src: "./seed.svg",
     imgClasses: "",
   },
-  'wingspan-at-least-50cm': {
+  "wingspan-at-least-50cm": {
     alt: "Wingspan at least 50cm",
     src: "./wingspan-at-least-50cm.svg",
     imgClasses: "",
   },
-  'wingspan-under-50cm': {
+  "wingspan-under-50cm": {
     alt: "Wingspan under 50cm",
     src: "./wingspan-under-50cm.svg",
     imgClasses: "",
   },
-}
+};
 
 export const BONUS_ICON_PARAMS: Record<Habitat, { src: string }> = {
   forest: {
-    src: './bonus-food.svg',
+    src: "./bonus-food.svg",
   },
   grassland: {
-    src: './bonus-egg.svg',
+    src: "./bonus-egg.svg",
   },
   wetland: {
-    src: './bonus-card.svg',
-  }
+    src: "./bonus-card.svg",
+  },
 };
