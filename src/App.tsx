@@ -106,6 +106,7 @@ function App() {
           onClick={() => {
             setMapSeed(seed);
           }}
+          id="generate-button"
         >
           Generate
         </button>
@@ -115,6 +116,7 @@ function App() {
             setSeed(newSeed);
             setMapSeed(newSeed);
           }}
+          id="new-seed-button"
         >
           New seed
         </button>
