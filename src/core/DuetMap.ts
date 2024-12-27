@@ -1,5 +1,4 @@
 import { Engine as RandomEngine, integer } from "random-js";
-import { Bitstring } from "@digitalbazaar/bitstring";
 
 const HABITATS = ["forest", "grassland", "wetland"] as const;
 export type Habitat = (typeof HABITATS)[number];

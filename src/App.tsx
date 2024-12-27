@@ -2,18 +2,14 @@ import { useState } from "react";
 import "./App.css";
 import {
   generateDuetMap,
-  toString,
-  neighbors,
   DuetMap,
-  Habitat,
-  Criterion,
   NUM_ROWS,
   SPACES_PER_ROW,
 } from "./core/DuetMap";
 import { MersenneTwister19937 as mt, string } from "random-js";
 import { BONUS_ICON_PARAMS, CRITERIA_ICON_PARAMS } from "./constants";
 
-function dotRepresentation(map: DuetMap) {
+function DuetMapDrawing({ map }: { map: DuetMap }) {
   const helperClasses: Record<number, string> = {
     0: "southeast-6",
     1: "southeast-6 southwest-3",
@@ -66,8 +62,6 @@ function dotRepresentation(map: DuetMap) {
   );
 }
 
-// const initialMap = generateDuetMap(mt.autoSeed());
-
 const seedGeneratorEngine = mt.autoSeed();
 const stringGenerator = string(
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
@@ -88,7 +82,6 @@ function App() {
 
   return (
     <>
-      {/* <code>{toString(map)}</code> */}
       <div className="main-bar">
         <input
           placeholder="seed"
@@ -119,28 +112,7 @@ function App() {
         </button>
       </div>
       <br />
-      {dotRepresentation(map)}
-
-      {/* <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
+      <DuetMapDrawing map={map} />
     </>
   );
 }
