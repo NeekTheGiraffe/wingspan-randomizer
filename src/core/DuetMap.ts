@@ -244,6 +244,15 @@ function encode2(map: PartialDuetMap): number {
   return (hash >>> 16) & 0x0000ffff; // 16-bit hash
 }
 
+function encode3(map: PartialDuetMap): string {
+  const mapper = {
+    forest: "f",
+    grassland: "g",
+    wetland: "w",
+  };
+  return map.map((h) => (h === null ? "n" : mapper[h])).join("");
+}
+
 function isDone(map: PartialDuetMap): map is Habitat[] {
   // console.log(map, map.length);
   for (let i = 0; i < map.length; i++) {
@@ -265,32 +274,43 @@ function determineViableMoves(map: PartialDuetMap) {
   // Perform DFS for each habitat
   for (const habitat of HABITATS) {
     // console.log('performing dfs');
-    const visited = new Array(NUM_SPACES).fill(false);
-    const stack = existingSpaces[habitat].slice();
-    if (stack.length === 0) {
+    if (existingSpaces[habitat].length === 0) {
       continue;
     }
-    for (const i of stack) {
-      visited[i] = true;
-    }
-    let nReachable = stack.length;
-    while (stack.length > 0 && nReachable < 12) {
-      const top = stack[stack.length - 1];
-      stack.pop();
-      for (const j of neighbors(top)) {
-        if (map[j] === null && !visited[j]) {
-          visited[j] = true;
-          nReachable++;
-          stack.push(j);
-        }
-      }
-    }
+    const nReachable = countReachable(map, existingSpaces[habitat], 12);
     if (nReachable < 12) {
-      // console.log('dfs failed')
-      // console.log(toString(map))
+      // console.log("dfs failed");
       return { isDeadEnd: true, viableMoves: [] };
     }
   }
+  for (let i = 0; i < HABITATS.length; i++) {
+    const nextIndex = (i + 1) % HABITATS.length;
+    if (
+      existingSpaces[HABITATS[i]].length === 0 ||
+      existingSpaces[HABITATS[nextIndex]].length === 0
+    ) {
+      continue;
+    }
+    const initialSpaces = [
+      ...existingSpaces[HABITATS[i]],
+      ...existingSpaces[HABITATS[nextIndex]],
+    ];
+    // console.log("pair dfs started");
+    const nReachable = countReachable(map, initialSpaces, 24);
+    if (nReachable < 24) {
+      // console.log(
+      //   "pair dfs failed",
+      //   HABITATS[i],
+      //   HABITATS[nextIndex],
+      //   nReachable,
+      //   initialSpaces,
+      // );
+      // console.log(toString(map));
+      return { isDeadEnd: true, viableMoves: [] };
+    }
+  }
+  // console.log("dfs succeeded");
+  // console.log(toString(map));
 
   // console.log('habitatCounts', habitatCounts);
   const result: Move[] = [];
@@ -320,6 +340,33 @@ function determineViableMoves(map: PartialDuetMap) {
       (h) => existingSpaces[h].length < 12 && nMovesPerHabitat[h] === 0,
     ),
   };
+}
+
+function countReachable(
+  map: PartialDuetMap,
+  initialSpaces: number[],
+  target: number,
+): number {
+  const visited = new Array(NUM_SPACES).fill(false);
+  // const stack = existingSpaces[habitat].slice();
+  const stack = initialSpaces.slice();
+  for (const i of stack) {
+    visited[i] = true;
+  }
+  let nReachable = stack.length;
+  while (stack.length > 0 && nReachable < target) {
+    const top = stack[stack.length - 1];
+    stack.pop();
+    for (const j of neighbors(top)) {
+      if (map[j] === null && !visited[j]) {
+        // console.log("visited", j);
+        visited[j] = true;
+        nReachable++;
+        stack.push(j);
+      }
+    }
+  }
+  return nReachable;
 }
 
 function shuffle<T>(array: T[], engine: RandomEngine): T[] {
