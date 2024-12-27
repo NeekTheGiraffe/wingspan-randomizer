@@ -236,13 +236,43 @@ function isDone(map: PartialDuetMap): map is Habitat[] {
 }
 
 function determineViableMoves(map: PartialDuetMap) {
-    const habitatCounts: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
+    const existingSpaces: {[h in Habitat]: number[]} = Object.assign({}, ...HABITATS.map(h => ({[h]: []})));
     for (let i = 0; i < numSpaces; i++) {
         const habitat = map[i];
         if (habitat !== null) {
-            habitatCounts[habitat]++;
+            existingSpaces[habitat].push(i);
         }
     }
+    // Perform DFS for each habitat
+    for (const habitat of HABITATS) {
+        // console.log('performing dfs');
+        const visited = new Array(36).fill(false);
+        const stack = existingSpaces[habitat].slice();
+        if (stack.length === 0) {
+            continue;
+        }
+        for (const i of stack) {
+            visited[i] = true;
+        }
+        let nReachable = stack.length;
+        while (stack.length > 0 && nReachable < 12) {
+            const top = stack[stack.length - 1];
+            stack.pop();
+            for (const j of neighbors(top)) {
+                if (map[j] === null && !visited[j]) {
+                    visited[j] = true;
+                    nReachable++;
+                    stack.push(j);
+                }
+            }
+        }
+        if (nReachable < 12) {
+            // console.log('dfs failed')
+            // console.log(toString(map))
+            return { isDeadEnd: true, viableMoves: [] };
+        }
+    }
+
     // console.log('habitatCounts', habitatCounts);
     const result: Move[] = [];
     const nMovesPerHabitat: {[h in Habitat]: number} = Object.assign({}, ...HABITATS.map(h => ({[h]: 0})));
@@ -253,8 +283,8 @@ function determineViableMoves(map: PartialDuetMap) {
         for (const habitat of HABITATS) {
             // const habitat = h as Habitat;
             // console.log(habitat, habitatCounts[habitat])
-            if (habitatCounts[habitat] === 0 || (
-                habitatCounts[habitat] !== 12 && neighbors(i).find(j => map[j] === habitat) !== undefined
+            if (existingSpaces[habitat].length === 0 || (
+                existingSpaces[habitat].length !== 12 && neighbors(i).find(j => map[j] === habitat) !== undefined
             )) {
                 // console.log({habitat, spaceIndex: i});
                 result.push({ habitat, spaceIndex: i });
@@ -265,7 +295,7 @@ function determineViableMoves(map: PartialDuetMap) {
     // console.log('viableMoves', result);
     return {
         viableMoves: result,
-        isDeadEnd: HABITATS.some(h => habitatCounts[h] < 12 && nMovesPerHabitat[h] === 0),
+        isDeadEnd: HABITATS.some(h => existingSpaces[h].length < 12 && nMovesPerHabitat[h] === 0),
     };
 }
 
@@ -333,14 +363,14 @@ export function neighbors(i: number): number[] {
 //  O - O - O - O - O - O
 //   \ / \ / \ / \ / \ / \
 //    O - O - O - O - O - O
-export function toString(map: DuetMap): string {
+export function toString(map: PartialDuetMap): string {
     const result = [];
     for (let row = 0; row < 6; row++) {
         if (row % 2 === 1) {
             result.push('  ');
         }
         for (let col = 0; col < 6; col++) {
-            const habitat = map.habitats[row * 6 + col];
+            const habitat = map[row * 6 + col];
             let ch = 'O';
             if (habitat === 'forest') {
                 ch = 'F';
