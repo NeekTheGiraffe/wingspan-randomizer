@@ -29,6 +29,13 @@
   --wetland-color: #7ec3e4;
 }
 
+#root {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+}
+
 code {
   white-space: pre-wrap;
 }

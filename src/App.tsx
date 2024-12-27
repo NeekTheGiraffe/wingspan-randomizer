@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import {
   generateDuetMap,
@@ -8,6 +8,7 @@ import {
 } from "./core/DuetMap";
 import { MersenneTwister19937 as mt, string } from "random-js";
 import { BONUS_ICON_PARAMS, CRITERIA_ICON_PARAMS } from "./constants";
+import { useSearchParams } from "react-router";
 
 function DuetMapDrawing({ map }: { map: DuetMap }) {
   const helperClasses: Record<number, string> = {
@@ -67,18 +68,27 @@ const stringGenerator = string(
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
 );
 const seedLength = 16;
-const initialSeed = stringGenerator(seedGeneratorEngine, seedLength);
 
 function stringToArray(s: string) {
   return [...Array(s.length).keys()].map((i) => s.charCodeAt(i));
 }
 
 function App() {
-  const [seed, setSeed] = useState(initialSeed);
-  const [seedHasChanged, setSeedHasChanged] = useState(false);
-  const [map, setMap] = useState(() =>
-    generateDuetMap(mt.seedWithArray(stringToArray(initialSeed))),
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [seed, setSeed] = useState(() => {
+    return (
+      searchParams.get("seed") ??
+      stringGenerator(seedGeneratorEngine, seedLength)
+    );
+  });
+  const [mapSeed, setMapSeed] = useState(seed);
+  const map = useMemo(() => {
+    return generateDuetMap(mt.seedWithArray(stringToArray(seed)));
+  }, [mapSeed]);
+
+  useEffect(() => {
+    setSearchParams({ seed: mapSeed });
+  }, [mapSeed, setSearchParams]);
 
   return (
     <>
@@ -87,15 +97,13 @@ function App() {
           placeholder="seed"
           value={seed}
           onChange={(e) => {
-            setSeedHasChanged(true);
             setSeed(e.target.value);
           }}
         />
         <button
-          disabled={!seedHasChanged}
+          disabled={mapSeed === seed}
           onClick={() => {
-            setMap(generateDuetMap(mt.seedWithArray(stringToArray(seed))));
-            setSeedHasChanged(false);
+            setMapSeed(seed);
           }}
         >
           Generate
@@ -104,11 +112,17 @@ function App() {
           onClick={() => {
             const newSeed = stringGenerator(seedGeneratorEngine, seedLength);
             setSeed(newSeed);
-            setMap(generateDuetMap(mt.seedWithArray(stringToArray(newSeed))));
-            setSeedHasChanged(false);
+            setMapSeed(newSeed);
           }}
         >
           New seed
+        </button>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+          }}
+        >
+          Copy link
         </button>
       </div>
       <br />
