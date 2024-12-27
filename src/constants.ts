@@ -1,4 +1,4 @@
-import { Criterion, Habitat } from "./core/DuetMap";
+import { Criterion, Habitat } from "./core/types";
 
 interface CriteriaIconParams {
   alt: string;

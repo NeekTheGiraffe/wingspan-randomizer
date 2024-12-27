@@ -1,73 +1,11 @@
 import { Engine as RandomEngine, integer } from "random-js";
-
-const HABITATS = ["forest", "grassland", "wetland"] as const;
-export type Habitat = (typeof HABITATS)[number];
-
-export const CRITERIA = [
-  "eats-invertebrate",
-  "eats-seed",
-  "eats-fruit",
-  "eats-rodent",
-  "eats-fish",
-  "beak-pointing-left",
-  "beak-pointing-right",
-  "bowl-nest",
-  "cavity-nest",
-  "ground-nest",
-  "platform-nest",
-  "wingspan-under-50cm",
-  "wingspan-at-least-50cm",
-] as const;
-export type Criterion = (typeof CRITERIA)[number];
-
-const CRITERIA_BY_HABITAT: Record<Habitat, Criterion[]> = {
-  forest: [
-    "bowl-nest",
-    "bowl-nest",
-    "cavity-nest",
-    "cavity-nest",
-    "platform-nest",
-    "eats-seed",
-    "eats-fruit",
-    "eats-invertebrate",
-    "eats-invertebrate",
-    "eats-rodent",
-    "wingspan-under-50cm",
-    "beak-pointing-left",
-  ],
-  grassland: [
-    "bowl-nest",
-    "cavity-nest",
-    "ground-nest",
-    "eats-seed",
-    "eats-seed",
-    "eats-invertebrate",
-    "eats-invertebrate",
-    "eats-fruit",
-    "eats-rodent",
-    "wingspan-under-50cm",
-    "wingspan-at-least-50cm",
-    "beak-pointing-right",
-  ],
-  wetland: [
-    "platform-nest",
-    "platform-nest",
-    "ground-nest",
-    "ground-nest",
-    "cavity-nest",
-    "eats-fish",
-    "eats-fish",
-    "eats-invertebrate",
-    "eats-seed",
-    "beak-pointing-left",
-    "beak-pointing-right",
-    "wingspan-at-least-50cm",
-  ],
-};
-
-export const NUM_ROWS = 6;
-export const SPACES_PER_ROW = 6;
-export const NUM_SPACES = 36;
+import { Habitat, Criterion, HABITATS } from "./types";
+import {
+  CRITERIA_BY_HABITAT,
+  NUM_ROWS,
+  NUM_SPACES,
+  SPACES_PER_ROW,
+} from "./constants";
 
 export interface DuetMap {
   habitats: Habitat[];
@@ -196,12 +134,6 @@ export function generateHabitats(engine: RandomEngine): {
   }
 }
 
-const mapping = {
-  forest: 1,
-  grassland: 2,
-  wetland: 3,
-};
-
 export function encode(map: PartialDuetMap): number {
   let result = 0;
   for (let i = 0; i < map.length; i++) {
@@ -222,6 +154,12 @@ export function encode(map: PartialDuetMap): number {
   }
   return result;
 }
+
+const mapping = {
+  forest: 1,
+  grassland: 2,
+  wetland: 3,
+};
 
 function encode2(map: PartialDuetMap): number {
   let hash = 0; // Initialize hash
@@ -262,6 +200,21 @@ function isDone(map: PartialDuetMap): map is Habitat[] {
   return true;
 }
 
+/**
+ * Given a partial duet map, return a list of all viable moves.
+ *
+ * A move is a new placement of a habitat in an empty/null space.
+ *
+ * A viable move is one of the following:
+ * - If the habitat is somewhere on the map already, a new space can be placed
+ *   adjacent to an existing space of that habitat type.
+ * - If the habitat is not on the map yet, it can be placed anywhere that's
+ *   empty.
+ *
+ * This function runs DFS on each habitat and pair of habitats. If the number of
+ * available spaces is below what's required, it will short circuit and return
+ * no viable moves.
+ */
 function determineViableMoves(map: PartialDuetMap) {
   const existingSpaces = forEachHabitat<number[]>(() => []);
   for (let i = 0; i < NUM_SPACES; i++) {

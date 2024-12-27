@@ -1,11 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import {
-  generateDuetMap,
-  DuetMap,
-  NUM_ROWS,
-  SPACES_PER_ROW,
-} from "./core/DuetMap";
+import { generateDuetMap, DuetMap } from "./core/DuetMap";
+import { NUM_ROWS, SPACES_PER_ROW } from "./core/constants";
 import { MersenneTwister19937 as mt, string } from "random-js";
 import { BONUS_ICON_PARAMS, CRITERIA_ICON_PARAMS } from "./constants";
 import { useSearchParams } from "react-router";
