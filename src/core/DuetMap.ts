@@ -155,40 +155,40 @@ export function encode(map: PartialDuetMap): number {
   return result;
 }
 
-const mapping = {
-  forest: 1,
-  grassland: 2,
-  wetland: 3,
-};
+// const mapping = {
+//   forest: 1,
+//   grassland: 2,
+//   wetland: 3,
+// };
 
-function encode2(map: PartialDuetMap): number {
-  let hash = 0; // Initialize hash
-  const PRIME = 0x9e3779b1; // A large prime for better mixing
+// function encode2(map: PartialDuetMap): number {
+//   let hash = 0; // Initialize hash
+//   const PRIME = 0x9e3779b1; // A large prime for better mixing
 
-  for (let i = 0; i < map.length; i++) {
-    const val = map[i];
-    const value = val ? mapping[val] : 0;
+//   for (let i = 0; i < map.length; i++) {
+//     const val = map[i];
+//     const value = val ? mapping[val] : 0;
 
-    // Mix in the current value into the hash
-    hash ^= value; // XOR the value
-    hash = (hash * PRIME) | 0; // Multiply by a prime and keep it 32-bit
-  }
+//     // Mix in the current value into the hash
+//     hash ^= value; // XOR the value
+//     hash = (hash * PRIME) | 0; // Multiply by a prime and keep it 32-bit
+//   }
 
-  hash ^= hash >>> 16;
-  hash = (hash * PRIME) | 0;
-  hash ^= hash >>> 13;
+//   hash ^= hash >>> 16;
+//   hash = (hash * PRIME) | 0;
+//   hash ^= hash >>> 13;
 
-  return (hash >>> 16) & 0x0000ffff; // 16-bit hash
-}
+//   return (hash >>> 16) & 0x0000ffff; // 16-bit hash
+// }
 
-function encode3(map: PartialDuetMap): string {
-  const mapper = {
-    forest: "f",
-    grassland: "g",
-    wetland: "w",
-  };
-  return map.map((h) => (h === null ? "n" : mapper[h])).join("");
-}
+// function encode3(map: PartialDuetMap): string {
+//   const mapper = {
+//     forest: "f",
+//     grassland: "g",
+//     wetland: "w",
+//   };
+//   return map.map((h) => (h === null ? "n" : mapper[h])).join("");
+// }
 
 function isDone(map: PartialDuetMap): map is Habitat[] {
   // console.log(map, map.length);

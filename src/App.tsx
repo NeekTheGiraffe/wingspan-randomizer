@@ -79,7 +79,7 @@ function App() {
   });
   const [mapSeed, setMapSeed] = useState(seed);
   const map = useMemo(() => {
-    return generateDuetMap(mt.seedWithArray(stringToArray(seed)));
+    return generateDuetMap(mt.seedWithArray(stringToArray(mapSeed)));
   }, [mapSeed]);
   const [showCheckmark, setShowCheckmark] = useState(0);
 
