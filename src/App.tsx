@@ -38,14 +38,14 @@ function DuetMapDrawing({ map }: { map: DuetMap }) {
                   <span className={`dot`}>
                     {map.bonuses[i] ? (
                       <img
-                        src={BONUS_ICON_PARAMS[habitat].src}
+                        src={`${import.meta.env.BASE_URL}${BONUS_ICON_PARAMS[habitat].src}`}
                         className="bonus"
                       />
                     ) : null}
                     <img
                       draggable={false}
                       className={`criterion ${imgClasses}`}
-                      src={src}
+                      src={`${import.meta.env.BASE_URL}${src}`}
                       alt={`${habitat} ${alt}`}
                     />
                     <div className={`hexagon ${habitat}`}></div>
