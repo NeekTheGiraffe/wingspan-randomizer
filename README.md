@@ -5,6 +5,8 @@ Asia](https://stonemaiergames.com/games/wingspan/wingspan-asia/). Duet mode is
 great, but it has the exact same map every game, so I hope this adds some spice
 ;)
 
+![Example generated map](docs/example.png)
+
 The map is seedable with link sharing, enabling reproducible results. However, I
 am actively working on the algorithm, so results may change between releases.
 
