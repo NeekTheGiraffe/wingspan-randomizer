@@ -96,6 +96,11 @@ function App() {
           onChange={(e) => {
             setSeed(e.target.value);
           }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              setMapSeed(seed);
+            }
+          }}
         />
         <button
           disabled={mapSeed === seed}
