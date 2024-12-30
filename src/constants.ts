@@ -85,3 +85,14 @@ export const BONUS_ICON_PARAMS: Record<Habitat, { src: string }> = {
     src: "/bonus-card.svg",
   },
 };
+
+export const TOKEN_ICON_PARAMS = {
+  yin: {
+    src: "/yin.svg",
+    alt: "Yin token",
+  },
+  yang: {
+    src: "/yang.svg",
+    alt: "Yang token",
+  },
+};

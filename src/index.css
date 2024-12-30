@@ -26,7 +26,12 @@
 
   --main-color: #ded4d5;
   --alternate-color: #f1e9ea;
-  --accent-color: #261c1c;
+  --accent-color: var(--dark-text-color);
+
+  --icon-filter: var(--dark-icon-filter);
+
+  --dark-text-color: #261c1c;
+  --dark-icon-filter: invert(5%) sepia(9%) saturate(2926%) hue-rotate(314deg) brightness(91%) contrast(84%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +39,7 @@
     --main-color: #2b2122;
     --alternate-color: #181212;
     --accent-color: #e3d9d9;
+    --icon-filter: invert(92%) sepia(4%) saturate(338%) hue-rotate(315deg) brightness(96%) contrast(91%);
   }
   /* button {
     background-color: var(--alternate-color);
@@ -88,9 +94,15 @@ button {
   color: var(--accent-color);
   cursor: pointer;
   transition: border-color 0.25s;
+  display: inline-flex;
+  justify-content: center;
+  gap: 0.5rem;
 }
 button:hover {
   border-color: var(--forest-color);
+}
+button:disabled:hover {
+  border-color: transparent !important;
 }
 button:focus,
 button:focus-visible {
@@ -114,6 +126,26 @@ img {
 
 /* Control panel */
 
+.mode-selection {
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.active-mode {
+  background-color: var(--grassland-color);
+  color: var(--dark-text-color);
+}
+
+.active-mode:hover {
+  border-color: transparent !important;
+}
+
+.active-mode img {
+  filter: var(--dark-icon-filter);
+}
+
 .main-bar {
   display: flex;
   flex-direction: row;
@@ -124,11 +156,11 @@ img {
   width: 0.95rem;
 }
 
-#generate-button:hover {
+#generate-button:hover, #edit-button:hover {
   border-color: var(--forest-color);
 }
 
-#new-seed-button:hover {
+#new-seed-button:hover, #play-button:hover {
   border-color: var(--grassland-color);
 }
 
@@ -136,8 +168,13 @@ img {
   width: 7rem;
 }
 
-#copy-link-button:hover {
+#copy-link-button:hover, #reset-button:hover {
   border-color: var(--wetland-color);
+}
+
+.ui-icon {
+  width: 1rem;
+  filter: var(--icon-filter);
 }
 
 /* Duet map */
@@ -166,6 +203,7 @@ img {
 }
 
 .dot {
+  border: unset;
   height: var(--circle-size);
   width: var(--circle-size);
   background-color: #dbd9e4;
@@ -173,11 +211,33 @@ img {
   display: inline-block;
   position: relative;
   outline: 5px solid #735b55;
+  transition: outline 0.1s;
+}
+
+.dot:disabled {
+  cursor: auto;
+}
+
+.dot:focus-visible {
+  outline: 6px double #a2fcff;
 }
 
 .dot:has(.nest) {
   background-color: #735b55;
   outline-offset: -1px;
+}
+
+/* Duet tokens */
+
+.token {
+  width: var(--circle-size);
+  z-index: 3;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /* Lines between spaces on the map */
@@ -265,7 +325,7 @@ img {
   left: calc(-0.5 * var(--gap-size));
   /* width: 50px; */
   width: calc(var(--circle-size) + var(--gap-size));
-  height: 50px;
+  height: var(--circle-size);
   background-color: #64c7cc;
   margin: 0;
   z-index: -2;
@@ -343,6 +403,7 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 1;
 }
 
 .wingspan {
