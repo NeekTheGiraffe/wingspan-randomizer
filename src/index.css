@@ -116,6 +116,11 @@ img {
   user-select: none;
 }
 
+p {
+  margin: 0;
+  color: var(--accent-color);
+}
+
 /* Main container */
 
 #root {
@@ -149,6 +154,7 @@ img {
 .main-bar {
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 0.5rem;
 }
 

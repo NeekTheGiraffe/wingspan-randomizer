@@ -201,14 +201,17 @@ function App() {
             </button>
           </>
         ) : (
-          <button
-            onClick={() =>
-              setPlayStates(() => new Array(NUM_SPACES).fill("empty"))
-            }
-            id="reset-button"
-          >
-            Reset
-          </button>
+          <>
+            <p>Click on a space to toggle between duet pieces!</p>
+            <button
+              onClick={() =>
+                setPlayStates(() => new Array(NUM_SPACES).fill("empty"))
+              }
+              id="reset-button"
+            >
+              Reset
+            </button>
+          </>
         )}
       </div>
       <br />
