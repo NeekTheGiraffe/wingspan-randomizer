@@ -115,7 +115,7 @@ function App() {
   );
 
   useEffect(() => {
-    setSearchParams({ seed: mapSeed });
+    setSearchParams({ seed: mapSeed }, { replace: true });
   }, [mapSeed, setSearchParams]);
 
   return (
